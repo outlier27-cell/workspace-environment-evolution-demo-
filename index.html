@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Environment-Driven Workspace Evolution Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="hero-copy-wrap">
+          <p class="eyebrow">Workspace-Bench 2.0 Prototype</p>
+          <h1>Environment-Driven Workspace Evolution</h1>
+          <p class="subtitle">
+            演示环境事件如何从外部世界进入生成系统，驱动 WorkUnit、文件生态、依赖图与可评测任务自动演化。
+          </p>
+          <div class="hero-badges">
+            <span>Event-driven</span>
+            <span>Dependency-aware</span>
+            <span>Snapshot-ready</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="resetBtn" class="ghost-btn" type="button">Reset</button>
+          <button id="generateBtn" class="primary-btn" type="button">Generate Event</button>
+          <button id="evolveBtn" class="primary-btn" type="button">Evolve Workspace</button>
+        </div>
+      </header>
+
+      <section class="formula-band" aria-label="core mechanism">
+        <div>
+          <strong>Core Mechanism</strong>
+          <span>Environment Agent = external event scheduler + realism controller + task opportunity generator</span>
+        </div>
+        <code>persona + environment -> events -> WorkUnits -> artifact ecology -> dependency-aware tasks</code>
+      </section>
+
+      <section class="stage-strip" aria-label="interactive stage">
+        <div class="stage-card active" data-stage-card="0">
+          <span>1</span>
+          <strong>Observe</strong>
+          <small>read profile, workspace state, coverage gap</small>
+        </div>
+        <div class="stage-card" data-stage-card="1">
+          <span>2</span>
+          <strong>Sample Event</strong>
+          <small>generate structured external event</small>
+        </div>
+        <div class="stage-card" data-stage-card="2">
+          <span>3</span>
+          <strong>Materialize</strong>
+          <small>create artifact family and snapshot</small>
+        </div>
+        <div class="stage-card" data-stage-card="3">
+          <span>4</span>
+          <strong>Evaluate</strong>
+          <small>derive task, decoys, rubrics</small>
+        </div>
+      </section>
+
+      <main class="dashboard">
+        <section class="panel input-panel">
+          <div class="panel-header">
+            <span class="step-pill">01</span>
+            <div>
+              <h2>Inputs</h2>
+              <p>User profile + environment profile + coverage gap</p>
+            </div>
+          </div>
+
+          <label class="field-label" for="personaSelect">Worker Persona</label>
+          <select id="personaSelect" class="select">
+            <option value="logistics">Logistics Manager</option>
+            <option value="researcher">Researcher</option>
+            <option value="product">AI Product Manager</option>
+          </select>
+
+          <div id="profileCard" class="profile-card"></div>
+
+          <div class="mini-grid">
+            <div class="metric-card">
+              <span>Deadline</span>
+              <strong id="deadlineMetric">High</strong>
+            </div>
+            <div class="metric-card">
+              <span>Incidents</span>
+              <strong id="incidentMetric">High</strong>
+            </div>
+            <div class="metric-card">
+              <span>Policy Drift</span>
+              <strong id="policyMetric">Medium</strong>
+            </div>
+          </div>
+
+          <div class="coverage-box">
+            <h3>Coverage Gap</h3>
+            <ul id="coverageList"></ul>
+          </div>
+
+          <div class="legend-box">
+            <h3>File State Legend</h3>
+            <div class="legend-row"><span class="legend-dot base"></span>Base artifact</div>
+            <div class="legend-row"><span class="legend-dot new"></span>New artifact</div>
+            <div class="legend-row"><span class="legend-dot updated"></span>Updated artifact</div>
+            <div class="legend-row"><span class="legend-dot stale"></span>Stale / decoy</div>
+            <div class="legend-row"><span class="legend-dot final"></span>Final deliverable</div>
+          </div>
+        </section>
+
+        <section class="panel event-panel">
+          <div class="panel-header">
+            <span class="step-pill">02</span>
+            <div>
+              <h2>Environment Agent</h2>
+              <p>Observe -> diagnose -> sample structured event</p>
+            </div>
+          </div>
+          <div id="eventCard" class="event-card empty-state">
+            点击 Generate Event 生成一个结构化外部事件。
+          </div>
+          <div class="agent-note">
+            <strong>Sampling rule</strong>
+            <span>event = sample(user_role, domain_context, workspace_state, coverage_gap)</span>
+          </div>
+          <div class="event-flow">
+            <div>Profile</div>
+            <span></span>
+            <div>State</div>
+            <span></span>
+            <div>Coverage</div>
+            <span></span>
+            <div>Event</div>
+          </div>
+        </section>
+
+        <section class="panel workspace-panel">
+          <div class="panel-header">
+            <span class="step-pill">03</span>
+            <div>
+              <h2>Workspace Evolution</h2>
+              <p>event -> WorkUnit -> artifact family -> snapshot</p>
+            </div>
+          </div>
+
+          <div class="snapshot-tabs">
+            <button class="tab active" data-snapshot="0" type="button">workspace_v0</button>
+            <button class="tab" data-snapshot="1" type="button">workspace_v1</button>
+            <button class="tab" data-snapshot="2" type="button">workspace_v2</button>
+          </div>
+
+          <div id="workspaceTree" class="file-tree"></div>
+        </section>
+
+        <section class="panel workunit-panel">
+          <div class="panel-header">
+            <span class="step-pill">04</span>
+            <div>
+              <h2>WorkUnit Lifecycle</h2>
+              <p>external event controls project state transitions</p>
+            </div>
+          </div>
+
+          <div id="workunitCard" class="workunit-card"></div>
+          <div class="timeline" id="timeline"></div>
+        </section>
+
+        <section class="panel graph-panel">
+          <div class="panel-header">
+            <span class="step-pill">05</span>
+            <div>
+              <h2>Dependency Graph</h2>
+              <p>required artifacts, stale decoys, final outputs</p>
+            </div>
+          </div>
+          <div id="graphCanvas" class="graph-canvas"></div>
+        </section>
+
+        <section class="panel task-panel">
+          <div class="panel-header">
+            <span class="step-pill">06</span>
+            <div>
+              <h2>Task & Evaluation</h2>
+              <p>Task Agent samples from event log + dependency graph</p>
+            </div>
+          </div>
+          <div id="taskCard" class="task-card"></div>
+        </section>
+
+        <section class="panel insight-panel">
+          <div class="panel-header">
+            <span class="step-pill">07</span>
+            <div>
+              <h2>What This Demonstrates</h2>
+              <p>the research claim behind the prototype</p>
+            </div>
+          </div>
+          <div class="insight-grid">
+            <div class="insight-item">
+              <strong>Events explain artifacts</strong>
+              <span>Files are generated because something happened in the simulated work world.</span>
+            </div>
+            <div class="insight-item">
+              <strong>WorkUnits carry continuity</strong>
+              <span>Projects evolve across snapshots instead of appearing as isolated files.</span>
+            </div>
+            <div class="insight-item">
+              <strong>Tasks come from graph state</strong>
+              <span>Evaluation targets are sampled from required files, stale decoys, and final outputs.</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
