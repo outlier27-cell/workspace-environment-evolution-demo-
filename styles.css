@@ -114,6 +114,12 @@ select {
   border: 1px solid transparent;
   cursor: pointer;
   font-weight: 750;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.primary-btn:hover,
+.ghost-btn:hover {
+  transform: translateY(-1px);
 }
 
 .primary-btn {
@@ -178,6 +184,11 @@ select {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.78);
   box-shadow: 0 10px 28px rgba(20, 39, 35, 0.06);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.stage-card:hover {
+  transform: translateY(-2px);
 }
 
 .stage-card span {
@@ -227,6 +238,12 @@ select {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.panel:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 24px 78px rgba(20, 39, 35, 0.13);
 }
 
 .workspace-panel {
@@ -714,6 +731,12 @@ li {
   background: #fff;
   box-shadow: 0 8px 20px rgba(21, 31, 25, 0.09);
   font-size: 12px;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.graph-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(21, 31, 25, 0.14);
 }
 
 .graph-node strong {
@@ -795,6 +818,21 @@ li {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.45;
+}
+
+.demo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px 4px 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.demo-footer strong {
+  color: var(--green);
 }
 
 @media (max-width: 1240px) {
