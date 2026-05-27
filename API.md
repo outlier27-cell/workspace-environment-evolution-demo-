@@ -1,4 +1,4 @@
-# Environment Agent API
+# Workspace-Bench Environment Agent API
 
 This repository includes a callable FastAPI interface for the Workspace-Bench Environment Agent prototype.
 
@@ -118,4 +118,3 @@ get_historical_tasks(workspace_id)
 ```
 
 The Environment Agent remains the decision layer. It decides what happened and how the workspace should evolve. A real Workspace Agent should materialize files, a Task Agent should generate benchmark tasks/rubrics, and a Generation Manager should coordinate snapshots and termination.
-

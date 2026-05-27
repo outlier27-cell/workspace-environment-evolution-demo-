@@ -1,6 +1,6 @@
-# Environment-Driven Workspace Evolution Demo
+# Workspace-Bench Environment Agent API Demo
 
-An independent demo for illustrating and calling an Environment Agent that drives Workspace-Bench-style dynamic workspace generation.
+An independent demo and callable API for the Workspace-Bench Environment Agent, which drives dynamic workspace evolution from user/environment profiles, workspace state, and historical tasks.
 
 ## Core Idea
 
