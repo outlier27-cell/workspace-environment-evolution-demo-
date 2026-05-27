@@ -5,13 +5,13 @@ This repository includes a callable FastAPI interface for the Workspace-Bench En
 Repository:
 
 ```text
-https://github.com/outlier27-cell/workspace-environment-evolution-demo-
+https://github.com/outlier27-cell/workspace-bench-environment-agent-api
 ```
 
 Static demo:
 
 ```text
-https://outlier27-cell.github.io/workspace-environment-evolution-demo-/
+https://outlier27-cell.github.io/workspace-bench-environment-agent-api/
 ```
 
 The static GitHub Pages demo cannot run Python. Deploy this repository to a Python-capable host such as Vercel or Render to expose the callable API.

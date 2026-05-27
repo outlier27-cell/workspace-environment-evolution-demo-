@@ -18,7 +18,7 @@ from environment_agent.schemas import (
 )
 
 
-app = FastAPI(title="Workspace-Bench Environment Agent API Demo")
+app = FastAPI(title="Workspace-Bench Environment Agent API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

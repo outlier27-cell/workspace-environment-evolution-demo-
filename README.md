@@ -1,11 +1,11 @@
-# Workspace-Bench Environment Agent API Demo
+# Workspace-Bench Environment Agent API
 
 An independent demo and callable API for the Workspace-Bench Environment Agent, which drives dynamic workspace evolution from user/environment profiles, workspace state, and historical tasks.
 
 ## Links
 
-- GitHub repository: <https://github.com/outlier27-cell/workspace-environment-evolution-demo->
-- Static GitHub Pages demo: <https://outlier27-cell.github.io/workspace-environment-evolution-demo-/>
+- GitHub repository: <https://github.com/outlier27-cell/workspace-bench-environment-agent-api>
+- Static GitHub Pages demo: <https://outlier27-cell.github.io/workspace-bench-environment-agent-api/>
 - API documentation: [API.md](./API.md)
 
 GitHub Pages hosts the visual demo only. It does not run Python services. To expose the callable API publicly, deploy this same repository to a Python-capable host such as Vercel or Render.
@@ -77,7 +77,7 @@ POST /api/environment-agent/manager-payload/from-store
 Static demo:
 
 - GitHub Pages deploys from `.github/workflows/pages.yml`.
-- The static page is served at `https://outlier27-cell.github.io/workspace-environment-evolution-demo-/`.
+- The static page is served at `https://outlier27-cell.github.io/workspace-bench-environment-agent-api/`.
 
 Callable API:
 
