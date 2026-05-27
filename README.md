@@ -2,6 +2,14 @@
 
 An independent demo and callable API for the Workspace-Bench Environment Agent, which drives dynamic workspace evolution from user/environment profiles, workspace state, and historical tasks.
 
+## Links
+
+- GitHub repository: <https://github.com/outlier27-cell/workspace-environment-evolution-demo->
+- Static GitHub Pages demo: <https://outlier27-cell.github.io/workspace-environment-evolution-demo-/>
+- API documentation: [API.md](./API.md)
+
+GitHub Pages hosts the visual demo only. It does not run Python services. To expose the callable API publicly, deploy this same repository to a Python-capable host such as Vercel or Render.
+
 ## Core Idea
 
 ```text
@@ -12,40 +20,70 @@ The static page shows structured external event sampling, WorkUnit lifecycle cha
 
 The Python API exposes the same Environment Agent flow as callable HTTP endpoints.
 
-## Run Static Demo Locally
+## Public API Usage
 
-```bash
-python -m http.server 8765
-```
-
-Then open:
+After deploying the repository to Vercel or another Python host, use the deployment domain directly over HTTPS. No local port is needed.
 
 ```text
-http://127.0.0.1:8765
+https://<your-api-domain>/api/health
+https://<your-api-domain>/api/docs
+https://<your-api-domain>/api/environment-agent/simulate
 ```
 
-## Run API Locally
+Example request:
 
 ```bash
-pip install -r requirements.txt
-python -m uvicorn api.index:app --reload --port 8765
-```
-
-Open:
-
-```text
-http://127.0.0.1:8765/docs
-```
-
-Example:
-
-```bash
-curl -X POST "http://127.0.0.1:8765/environment-agent/simulate" \
+curl -X POST "https://<your-api-domain>/api/environment-agent/simulate" \
   -H "Content-Type: application/json" \
   -d '{"user_id":"user_logistics_001","environment_id":"env_peak_logistics","workspace_id":"workspace_logistics_demo","seed":7,"steps":3,"reset_before_run":true}'
 ```
 
-For the full API contract, see [API.md](./API.md).
+Expected high-level result:
+
+```json
+{
+  "workspace_id": "workspace_logistics_demo",
+  "event_ids": [
+    "evt_workspace_logistics_demo_incident_0001_0007",
+    "evt_workspace_logistics_demo_policy_change_0002_0008",
+    "evt_workspace_logistics_demo_collaboration_0003_0009"
+  ],
+  "final_workspace_state": {
+    "current_snapshot_id": "snap_0004"
+  }
+}
+```
+
+## Main Endpoints
+
+```text
+GET  /api/health
+GET  /api/profiles/user/{user_id}
+GET  /api/profiles/environment/{environment_id}
+GET  /api/workspace/{workspace_id}/state
+GET  /api/workspace/{workspace_id}/tasks/history
+GET  /api/workspace/{workspace_id}/events
+GET  /api/workspace/{workspace_id}/inspect
+GET  /api/workspace/{workspace_id}/quality
+POST /api/workspace/{workspace_id}/reset
+POST /api/environment-agent/diagnose
+POST /api/environment-agent/step/from-store
+POST /api/environment-agent/simulate
+POST /api/environment-agent/manager-payload/from-store
+```
+
+## Deployment
+
+Static demo:
+
+- GitHub Pages deploys from `.github/workflows/pages.yml`.
+- The static page is served at `https://outlier27-cell.github.io/workspace-environment-evolution-demo-/`.
+
+Callable API:
+
+- Deploy the same repository to Vercel, Render, or another Python-capable host.
+- Vercel uses `api/index.py` and `vercel.json`.
+- Public API routes are served under `/api/...`.
 
 ## Files
 
@@ -56,13 +94,13 @@ For the full API contract, see [API.md](./API.md).
 - `api/index.py`: FastAPI serverless entrypoint
 - `API.md`: callable API contract
 
-## Deployment
+## Local Development Only
 
-The static demo can be deployed with GitHub Pages, Vercel, Netlify, or any static host.
+Use local ports only when developing or debugging on your machine:
 
-The API needs a Python runtime. Deploy this repo to Vercel, Render, or another Python-capable host. On Vercel, the callable endpoints are available under `/api/...`, for example:
-
-```text
-https://<your-domain>/api/health
-https://<your-domain>/api/environment-agent/simulate
+```bash
+pip install -r requirements.txt
+python -m uvicorn api.index:app --reload --port 8765
 ```
+
+Then open `http://127.0.0.1:8765/api/docs`.

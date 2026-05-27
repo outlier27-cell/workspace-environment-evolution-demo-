@@ -2,6 +2,20 @@
 
 This repository includes a callable FastAPI interface for the Workspace-Bench Environment Agent prototype.
 
+Repository:
+
+```text
+https://github.com/outlier27-cell/workspace-environment-evolution-demo-
+```
+
+Static demo:
+
+```text
+https://outlier27-cell.github.io/workspace-environment-evolution-demo-/
+```
+
+The static GitHub Pages demo cannot run Python. Deploy this repository to a Python-capable host such as Vercel or Render to expose the callable API.
+
 The API models:
 
 ```text
@@ -14,17 +28,20 @@ user profile + environment profile + workspace state + historical tasks
   -> optional mock workspace evolution
 ```
 
-## Run Locally
+## Public API Base URL
 
-```bash
-pip install -r requirements.txt
-python -m uvicorn api.index:app --reload --port 8765
-```
-
-Open:
+After deployment, call the API through the deployment domain:
 
 ```text
-http://127.0.0.1:8765/docs
+https://<your-api-domain>/api
+```
+
+For example:
+
+```text
+https://<your-api-domain>/api/health
+https://<your-api-domain>/api/docs
+https://<your-api-domain>/api/environment-agent/simulate
 ```
 
 ## Deploy Publicly
@@ -35,15 +52,6 @@ This repo can be deployed to a Python serverless host such as Vercel.
 vercel
 vercel --prod
 ```
-
-After deployment, call:
-
-```text
-https://<your-deployment-domain>/api/health
-https://<your-deployment-domain>/api/docs
-```
-
-GitHub Pages can still serve the static visual demo, but it cannot run the Python API by itself.
 
 ## Main Endpoints
 
@@ -64,12 +72,10 @@ POST /api/environment-agent/simulate
 POST /api/environment-agent/manager-payload/from-store
 ```
 
-When running directly with `uvicorn`, the same endpoints also work without the `/api` prefix.
-
 ## Example: Simulate Workspace Evolution
 
 ```bash
-curl -X POST "http://127.0.0.1:8765/environment-agent/simulate" \
+curl -X POST "https://<your-api-domain>/api/environment-agent/simulate" \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "user_logistics_001",
@@ -105,6 +111,21 @@ Expected shape:
 ```
 
 The real response contains full artifact plans, dependency mutations, constraints, task opportunities, and the applied mock workspace state.
+
+## Local Development Only
+
+Use local ports only for development:
+
+```bash
+pip install -r requirements.txt
+python -m uvicorn api.index:app --reload --port 8765
+```
+
+Open:
+
+```text
+http://127.0.0.1:8765/api/docs
+```
 
 ## Integration Contract
 
