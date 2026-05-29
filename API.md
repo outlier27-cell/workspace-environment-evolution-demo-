@@ -16,6 +16,12 @@ https://outlier27-cell.github.io/workspace-bench-environment-agent-api/
 
 The static GitHub Pages demo cannot run Python. Deploy this repository to a Python-capable host such as Vercel or Render to expose the callable API.
 
+Current generation status:
+
+- The public interface is backend-driven.
+- The default backend is `mock_rule_based`, a deterministic demo backend built from hand-written templates.
+- A production non-rule generator should implement `PlanningBackend` and report `generation_mode` as `llm` or `external_provider`.
+
 The API models:
 
 ```text
@@ -65,6 +71,7 @@ GET  /api/workspace/{workspace_id}/events
 GET  /api/workspace/{workspace_id}/inspect
 GET  /api/workspace/{workspace_id}/quality
 POST /api/workspace/{workspace_id}/reset
+GET  /api/environment-agent/backend
 POST /api/environment-agent/diagnose
 POST /api/environment-agent/step
 POST /api/environment-agent/step/from-store
@@ -97,6 +104,11 @@ Expected shape:
       "external_event": {
         "event_type": "incident"
       },
+      "planner_backend": {
+        "name": "mock_rule_based",
+        "generation_mode": "mock_rule_based",
+        "is_mock": true
+      },
       "evolution_plan": {
         "artifact_plan": []
       },
@@ -111,6 +123,26 @@ Expected shape:
 ```
 
 The real response contains full artifact plans, dependency mutations, constraints, task opportunities, and the applied mock workspace state.
+
+## Backend Metadata
+
+Check the active generation backend:
+
+```bash
+curl "https://<your-api-domain>/api/environment-agent/backend"
+```
+
+Expected default response:
+
+```json
+{
+  "name": "mock_rule_based",
+  "generation_mode": "mock_rule_based",
+  "version": "0.1.0",
+  "is_mock": true,
+  "description": "Deterministic demo backend backed by hand-written event, artifact, dependency, constraint, and task templates."
+}
+```
 
 ## Local Development Only
 
@@ -138,4 +170,4 @@ get_workspace_state(workspace_id)
 get_historical_tasks(workspace_id)
 ```
 
-The Environment Agent remains the decision layer. It decides what happened and how the workspace should evolve. A real Workspace Agent should materialize files, a Task Agent should generate benchmark tasks/rubrics, and a Generation Manager should coordinate snapshots and termination.
+Replace `MockRuleBasedPlanningBackend` with your real `PlanningBackend` implementation when you want non-rule generation. The Environment Agent remains the orchestration layer. A real Workspace Agent should materialize files, a Task Agent should generate benchmark tasks/rubrics, and a Generation Manager should coordinate snapshots and termination.

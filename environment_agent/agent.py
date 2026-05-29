@@ -1,15 +1,20 @@
 from __future__ import annotations
 
-from environment_agent.artifact_planner import plan_artifacts_and_dependencies
 from environment_agent.diagnosis import diagnose_workspace
-from environment_agent.event_sampler import sample_event
-from environment_agent.schemas import AgentStepRequest, AgentStepResponse, WorkspaceEvolutionPlan
+from environment_agent.interfaces import PlanningBackend
+from environment_agent.planning_backend import MockRuleBasedPlanningBackend
+from environment_agent.schemas import AgentStepRequest, AgentStepResponse, PlannerBackendInfo
 from environment_agent.state_applier import apply_evolution_plan
-from environment_agent.task_opportunity import generate_task_opportunities
-from environment_agent.workunit_planner import plan_workunit_mutations
 
 
 class EnvironmentAgent:
+    def __init__(self, planning_backend: PlanningBackend | None = None) -> None:
+        self._planning_backend = planning_backend or MockRuleBasedPlanningBackend()
+
+    @property
+    def planner_backend_info(self) -> PlannerBackendInfo:
+        return _backend_info(self._planning_backend)
+
     def step(self, request: AgentStepRequest) -> AgentStepResponse:
         diagnosis = diagnose_workspace(
             request.user_profile,
@@ -17,50 +22,29 @@ class EnvironmentAgent:
             request.workspace_state,
             request.historical_tasks,
         )
-        event = sample_event(
-            request.user_profile,
-            request.environment_profile,
-            request.workspace_state,
-            request.historical_tasks,
-            diagnosis,
-            request.seed,
-            request.event_index,
-        )
-        workunit_mutations = plan_workunit_mutations(request.workspace_state, event)
-        artifact_plan, dependency_mutations, constraints = plan_artifacts_and_dependencies(
-            request.workspace_state,
-            event,
-            workunit_mutations,
-        )
-        evolution_plan = WorkspaceEvolutionPlan(
-            plan_id=f"plan_{event.event_id}",
-            source_event_id=event.event_id,
-            workunit_mutations=workunit_mutations,
-            artifact_plan=artifact_plan,
-            dependency_mutations=dependency_mutations,
-            snapshot_policy="snapshot_after_plan_application",
-            planner_notes=[
-                "Environment Agent emits a plan; Workspace Agent materializes files.",
-                "Task Agent should sample tasks from event, artifacts, dependency mutations, and constraints.",
-            ],
-        )
-        opportunities = generate_task_opportunities(
-            event,
-            artifact_plan,
-            dependency_mutations,
-            constraints,
-            request.historical_tasks,
-        )
+        planned_step = self._planning_backend.plan(request, diagnosis)
         updated_state = (
-            apply_evolution_plan(request.workspace_state, event, evolution_plan)
+            apply_evolution_plan(
+                request.workspace_state,
+                planned_step.external_event,
+                planned_step.evolution_plan,
+            )
             if request.apply_to_mock_state
             else None
         )
         return AgentStepResponse(
+            planner_backend=self.planner_backend_info,
             diagnosis=diagnosis,
-            external_event=event,
-            constraints=constraints,
-            evolution_plan=evolution_plan,
-            task_opportunities=opportunities,
+            external_event=planned_step.external_event,
+            constraints=planned_step.constraints,
+            evolution_plan=planned_step.evolution_plan,
+            task_opportunities=planned_step.task_opportunities,
             updated_workspace_state=updated_state,
         )
+
+
+def _backend_info(backend: PlanningBackend) -> PlannerBackendInfo:
+    info = backend.backend_info
+    if isinstance(info, PlannerBackendInfo):
+        return info
+    return PlannerBackendInfo.model_validate(info)

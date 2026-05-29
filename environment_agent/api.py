@@ -48,6 +48,11 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/environment-agent/backend")
+def get_backend():
+    return agent.planner_backend_info
+
+
 @app.get("/profiles/user/{user_id}")
 def get_user_profile(user_id: str):
     return store.get_user_profile(user_id)

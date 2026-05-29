@@ -2,6 +2,12 @@
 
 An independent demo and callable API for the Workspace-Bench Environment Agent, which drives dynamic workspace evolution from user/environment profiles, workspace state, and historical tasks.
 
+Current generation status:
+
+- The API is framework/backend-driven: `EnvironmentAgent` diagnoses the workspace, calls a pluggable planning backend, and optionally applies the returned plan to mock workspace state.
+- The default backend is `mock_rule_based`. It uses deterministic hand-written templates for demos, tests, and integration debugging.
+- Real non-rule generation should be connected by implementing a `PlanningBackend` with `generation_mode="llm"` or `generation_mode="external_provider"`.
+
 ## Links
 
 - GitHub repository: <https://github.com/outlier27-cell/workspace-bench-environment-agent-api>
@@ -66,6 +72,7 @@ GET  /api/workspace/{workspace_id}/events
 GET  /api/workspace/{workspace_id}/inspect
 GET  /api/workspace/{workspace_id}/quality
 POST /api/workspace/{workspace_id}/reset
+GET  /api/environment-agent/backend
 POST /api/environment-agent/diagnose
 POST /api/environment-agent/step/from-store
 POST /api/environment-agent/simulate
@@ -91,6 +98,7 @@ Callable API:
 - `styles.css`: visual design
 - `app.js`: scenario data and interaction logic
 - `environment_agent/`: Environment Agent implementation
+- `environment_agent/planning_backend.py`: default mock backend and backend boundary
 - `api/index.py`: FastAPI serverless entrypoint
 - `API.md`: callable API contract
 

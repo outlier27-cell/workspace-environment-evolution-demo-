@@ -4,9 +4,13 @@ from typing import Protocol
 
 from environment_agent.schemas import (
     AgentStepResponse,
+    AgentStepRequest,
+    CoverageDiagnosis,
     EnvironmentProfile,
     ExternalEvent,
     HistoricalTasks,
+    PlannedEnvironmentStep,
+    PlannerBackendInfo,
     UserProfile,
     WorkspaceEvolutionPlan,
     WorkspaceState,
@@ -47,3 +51,14 @@ class EvolutionSink(Protocol):
         response: AgentStepResponse,
     ) -> WorkspaceState:
         """Apply a generated evolution plan to a backing state store."""
+
+
+class PlanningBackend(Protocol):
+    backend_info: PlannerBackendInfo | dict
+
+    def plan(
+        self,
+        request: AgentStepRequest,
+        diagnosis: CoverageDiagnosis,
+    ) -> PlannedEnvironmentStep:
+        """Generate one environment event, evolution plan, constraints, and task opportunities."""

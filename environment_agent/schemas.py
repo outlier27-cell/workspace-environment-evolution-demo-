@@ -20,6 +20,7 @@ WorkUnitStatus = Literal["active", "paused", "closed", "stale"]
 WorkUnitAction = Literal["create", "advance", "split", "merge", "pause", "close"]
 ArtifactAction = Literal["create", "update", "mark_stale", "archive", "reference"]
 DependencyAction = Literal["add", "remove", "mark_stale"]
+GenerationMode = Literal["mock_rule_based", "llm", "external_provider"]
 
 
 class UserProfile(BaseModel):
@@ -195,6 +196,21 @@ class TaskOpportunity(BaseModel):
     negative_rubric_hints: list[str] = Field(default_factory=list)
 
 
+class PlannerBackendInfo(BaseModel):
+    name: str
+    generation_mode: GenerationMode
+    version: str = "0.1.0"
+    is_mock: bool = False
+    description: str
+
+
+class PlannedEnvironmentStep(BaseModel):
+    external_event: ExternalEvent
+    constraints: list[EnvironmentConstraint]
+    evolution_plan: WorkspaceEvolutionPlan
+    task_opportunities: list[TaskOpportunity]
+
+
 class AgentStepRequest(BaseModel):
     user_profile: UserProfile
     environment_profile: EnvironmentProfile
@@ -206,6 +222,7 @@ class AgentStepRequest(BaseModel):
 
 
 class AgentStepResponse(BaseModel):
+    planner_backend: PlannerBackendInfo
     diagnosis: CoverageDiagnosis
     external_event: ExternalEvent
     constraints: list[EnvironmentConstraint]
