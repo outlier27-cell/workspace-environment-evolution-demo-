@@ -8,6 +8,7 @@ Current generation status:
 - The default backend is `mock_rule_based`. It uses deterministic hand-written templates for demos, tests, and integration debugging.
 - Real non-rule generation should be connected by implementing a `PlanningBackend` with `generation_mode="llm"` or `generation_mode="external_provider"`.
 - Backend output is validated before workspace evolution. Invalid event-plan-task references return a structured `422 plan_validation_failed` response.
+- Unknown mock-store resource IDs return a structured `404 store_resource_not_found` response instead of an internal server error.
 
 ## Links
 

@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from environment_agent.agent import EnvironmentAgent
 from environment_agent.diagnosis import diagnose_workspace
 from environment_agent.manager_payload import build_manager_payload
-from environment_agent.mock_store import MockEnvironmentStore
+from environment_agent.mock_store import MockEnvironmentStore, StoreResourceNotFound
 from environment_agent.quality import build_quality_report
 from environment_agent.schemas import (
     AgentStepRequest,
@@ -43,6 +43,23 @@ def plan_validation_exception_handler(
             "detail": {
                 "error": "plan_validation_failed",
                 "validation_report": exc.report.model_dump(),
+            }
+        },
+    )
+
+
+@app.exception_handler(StoreResourceNotFound)
+def store_resource_not_found_exception_handler(
+    _request: Request,
+    exc: StoreResourceNotFound,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=404,
+        content={
+            "detail": {
+                "error": "store_resource_not_found",
+                "resource_type": exc.resource_type,
+                "resource_id": exc.resource_id,
             }
         },
     )

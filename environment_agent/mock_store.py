@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from typing import TypeVar
 
 from environment_agent.schemas import (
     AgentStepResponse,
@@ -15,6 +16,23 @@ from environment_agent.schemas import (
     WorkspaceState,
     WorkUnitState,
 )
+
+
+T = TypeVar("T")
+
+
+class StoreResourceNotFound(KeyError):
+    def __init__(self, resource_type: str, resource_id: str) -> None:
+        self.resource_type = resource_type
+        self.resource_id = resource_id
+        super().__init__(f"{resource_type} '{resource_id}' not found")
+
+
+def _lookup(mapping: dict[str, T], resource_type: str, resource_id: str) -> T:
+    try:
+        return mapping[resource_id]
+    except KeyError as exc:
+        raise StoreResourceNotFound(resource_type, resource_id) from exc
 
 
 class MockEnvironmentStore:
@@ -143,19 +161,19 @@ class MockEnvironmentStore:
         self._initial_step_responses = deepcopy(self._step_responses)
 
     def get_user_profile(self, user_id: str) -> UserProfile:
-        return deepcopy(self._users[user_id])
+        return deepcopy(_lookup(self._users, "user", user_id))
 
     def get_environment_profile(self, environment_id: str) -> EnvironmentProfile:
-        return deepcopy(self._environments[environment_id])
+        return deepcopy(_lookup(self._environments, "environment", environment_id))
 
     def get_workspace_state(self, workspace_id: str) -> WorkspaceState:
-        return deepcopy(self._states[workspace_id])
+        return deepcopy(_lookup(self._states, "workspace", workspace_id))
 
     def set_workspace_state(self, workspace_state: WorkspaceState) -> None:
         self._states[workspace_state.workspace_id] = deepcopy(workspace_state)
 
     def get_historical_tasks(self, workspace_id: str) -> HistoricalTasks:
-        return deepcopy(self._histories[workspace_id])
+        return deepcopy(_lookup(self._histories, "workspace", workspace_id))
 
     def list_event_ids(self, workspace_id: str) -> list[str]:
         return list(self._event_ids.get(workspace_id, []))
@@ -208,6 +226,8 @@ class MockEnvironmentStore:
             existing_task_ids.add(task_id)
 
     def reset_workspace(self, workspace_id: str) -> None:
+        if workspace_id not in self._initial_states:
+            raise StoreResourceNotFound("workspace", workspace_id)
         self._states[workspace_id] = deepcopy(self._initial_states[workspace_id])
         self._histories[workspace_id] = deepcopy(self._initial_histories[workspace_id])
         self._event_ids[workspace_id] = deepcopy(self._initial_event_ids[workspace_id])

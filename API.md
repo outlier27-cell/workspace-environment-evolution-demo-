@@ -22,6 +22,7 @@ Current generation status:
 - The default backend is `mock_rule_based`, a deterministic demo backend built from hand-written templates.
 - A production non-rule generator should implement `PlanningBackend` and report `generation_mode` as `llm` or `external_provider`.
 - Every backend output passes a validation gate before mock state application. Invalid references return HTTP `422` with a structured validation report.
+- Unknown mock-store `user_id`, `environment_id`, or `workspace_id` values return HTTP `404` with a structured resource-not-found error.
 
 The API models:
 
@@ -152,6 +153,18 @@ If validation fails, the API returns:
       "status": "failed",
       "errors": ["task opportunity 'opp_bad' requires unknown artifact 'art_missing'"]
     }
+  }
+}
+```
+
+If a from-store endpoint references an unknown mock-store resource, the API returns:
+
+```json
+{
+  "detail": {
+    "error": "store_resource_not_found",
+    "resource_type": "workspace",
+    "resource_id": "missing_workspace"
   }
 }
 ```
