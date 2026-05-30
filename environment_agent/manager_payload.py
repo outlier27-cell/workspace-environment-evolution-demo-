@@ -7,6 +7,7 @@ def build_manager_payload(response: AgentStepResponse) -> dict:
     return {
         "target_agent": "generation_manager",
         "planner_backend": response.planner_backend.model_dump(),
+        "validation_report": response.validation_report.model_dump(),
         "source_event": response.external_event.model_dump(),
         "constraints": [constraint.model_dump() for constraint in response.constraints],
         "workspace_agent_queue": [

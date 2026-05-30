@@ -21,6 +21,7 @@ Current generation status:
 - The public interface is backend-driven.
 - The default backend is `mock_rule_based`, a deterministic demo backend built from hand-written templates.
 - A production non-rule generator should implement `PlanningBackend` and report `generation_mode` as `llm` or `external_provider`.
+- Every backend output passes a validation gate before mock state application. Invalid references return HTTP `422` with a structured validation report.
 
 The API models:
 
@@ -109,6 +110,10 @@ Expected shape:
         "generation_mode": "mock_rule_based",
         "is_mock": true
       },
+      "validation_report": {
+        "status": "passed",
+        "errors": []
+      },
       "evolution_plan": {
         "artifact_plan": []
       },
@@ -123,6 +128,33 @@ Expected shape:
 ```
 
 The real response contains full artifact plans, dependency mutations, constraints, task opportunities, and the applied mock workspace state.
+
+## Validation Gate
+
+The API checks backend output before applying workspace evolution or forwarding manager queues. The validation gate checks:
+
+```text
+event links
+WorkUnit references
+artifact dependencies
+dependency graph endpoints
+task required artifacts
+constraint event references
+```
+
+If validation fails, the API returns:
+
+```json
+{
+  "detail": {
+    "error": "plan_validation_failed",
+    "validation_report": {
+      "status": "failed",
+      "errors": ["task opportunity 'opp_bad' requires unknown artifact 'art_missing'"]
+    }
+  }
+}
+```
 
 ## Backend Metadata
 
@@ -170,4 +202,4 @@ get_workspace_state(workspace_id)
 get_historical_tasks(workspace_id)
 ```
 
-Replace `MockRuleBasedPlanningBackend` with your real `PlanningBackend` implementation when you want non-rule generation. The Environment Agent remains the orchestration layer. A real Workspace Agent should materialize files, a Task Agent should generate benchmark tasks/rubrics, and a Generation Manager should coordinate snapshots and termination.
+Replace `MockRuleBasedPlanningBackend` with your real `PlanningBackend` implementation when you want non-rule generation. The Environment Agent remains the orchestration layer and validates the returned `PlannedEnvironmentStep` before downstream agents act. A real Workspace Agent should materialize files, a Task Agent should generate benchmark tasks/rubrics, and a Generation Manager should coordinate snapshots and termination.

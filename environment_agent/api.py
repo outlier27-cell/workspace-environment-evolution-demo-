@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from environment_agent.agent import EnvironmentAgent
@@ -16,6 +17,7 @@ from environment_agent.schemas import (
     SimulationRequest,
     SimulationResponse,
 )
+from environment_agent.validation import PlanValidationError
 
 
 app = FastAPI(title="Workspace-Bench Environment Agent API")
@@ -28,6 +30,22 @@ app.add_middleware(
 )
 store = MockEnvironmentStore()
 agent = EnvironmentAgent()
+
+
+@app.exception_handler(PlanValidationError)
+def plan_validation_exception_handler(
+    _request: Request,
+    exc: PlanValidationError,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": {
+                "error": "plan_validation_failed",
+                "validation_report": exc.report.model_dump(),
+            }
+        },
+    )
 
 
 def reset_mock_store_for_tests() -> None:

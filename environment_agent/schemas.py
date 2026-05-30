@@ -211,6 +211,13 @@ class PlannedEnvironmentStep(BaseModel):
     task_opportunities: list[TaskOpportunity]
 
 
+class PlanValidationReport(BaseModel):
+    status: Literal["passed", "failed"]
+    checks: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class AgentStepRequest(BaseModel):
     user_profile: UserProfile
     environment_profile: EnvironmentProfile
@@ -223,6 +230,7 @@ class AgentStepRequest(BaseModel):
 
 class AgentStepResponse(BaseModel):
     planner_backend: PlannerBackendInfo
+    validation_report: PlanValidationReport
     diagnosis: CoverageDiagnosis
     external_event: ExternalEvent
     constraints: list[EnvironmentConstraint]

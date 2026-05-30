@@ -7,6 +7,7 @@ Current generation status:
 - The API is framework/backend-driven: `EnvironmentAgent` diagnoses the workspace, calls a pluggable planning backend, and optionally applies the returned plan to mock workspace state.
 - The default backend is `mock_rule_based`. It uses deterministic hand-written templates for demos, tests, and integration debugging.
 - Real non-rule generation should be connected by implementing a `PlanningBackend` with `generation_mode="llm"` or `generation_mode="external_provider"`.
+- Backend output is validated before workspace evolution. Invalid event-plan-task references return a structured `422 plan_validation_failed` response.
 
 ## Links
 
