@@ -21,6 +21,7 @@ WorkUnitAction = Literal["create", "advance", "split", "merge", "pause", "close"
 ArtifactAction = Literal["create", "update", "mark_stale", "archive", "reference"]
 DependencyAction = Literal["add", "remove", "mark_stale"]
 GenerationMode = Literal["mock_rule_based", "llm", "external_provider"]
+RUN_ID_PATTERN = r"^[A-Za-z0-9_.-]{1,48}$"
 
 
 class UserProfile(BaseModel):
@@ -243,6 +244,7 @@ class SimulationRequest(BaseModel):
     user_id: str
     environment_id: str
     workspace_id: str
+    run_id: str = Field(default="default", min_length=1, max_length=48, pattern=RUN_ID_PATTERN)
     seed: int = 0
     steps: int = Field(default=1, ge=1, le=50)
     reset_before_run: bool = True

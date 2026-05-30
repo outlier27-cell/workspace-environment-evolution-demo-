@@ -7,8 +7,9 @@ Current generation status:
 - The API is framework/backend-driven: `EnvironmentAgent` diagnoses the workspace, calls a pluggable planning backend, and optionally applies the returned plan to mock workspace state.
 - The default backend is `mock_rule_based`. It uses deterministic hand-written templates for demos, tests, and integration debugging.
 - Real non-rule generation should be connected by implementing a `PlanningBackend` with `generation_mode="llm"` or `generation_mode="external_provider"`.
-- Backend output is validated before workspace evolution. Invalid event-plan-task references return a structured `422 plan_validation_failed` response.
+- Backend output is validated before workspace evolution. Invalid event-plan-task-workunit references return a structured `422 plan_validation_failed` response.
 - Unknown mock-store resource IDs return a structured `404 store_resource_not_found` response instead of an internal server error.
+- Store-backed calls accept an optional `run_id` so demo simulations can isolate independent runs instead of sharing one mutable mock store. Non-default runs are process-local demo state, capped at 32 active runs, and `run_id` must match `[A-Za-z0-9_.-]{1,48}`.
 
 ## Links
 
@@ -43,7 +44,7 @@ Example request:
 ```bash
 curl -X POST "https://<your-api-domain>/api/environment-agent/simulate" \
   -H "Content-Type: application/json" \
-  -d '{"user_id":"user_logistics_001","environment_id":"env_peak_logistics","workspace_id":"workspace_logistics_demo","seed":7,"steps":3,"reset_before_run":true}'
+  -d '{"user_id":"user_logistics_001","environment_id":"env_peak_logistics","workspace_id":"workspace_logistics_demo","run_id":"demo_run","seed":7,"steps":3,"reset_before_run":true}'
 ```
 
 Expected high-level result:
@@ -93,6 +94,7 @@ Callable API:
 - Deploy the same repository to Vercel, Render, or another Python-capable host.
 - Vercel uses `api/index.py` and `vercel.json`.
 - Public API routes are served under `/api/...`.
+- Use `run_id` on store-backed endpoints and workspace query endpoints when you want isolated demo state. Omitting it uses the shared `default` run. Non-default `run_id` values are short safe identifiers (`[A-Za-z0-9_.-]{1,48}`); the API keeps at most 32 active process-local demo runs.
 
 ## Files
 

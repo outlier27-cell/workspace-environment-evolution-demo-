@@ -31,8 +31,10 @@ def validate_planned_step(
     plan = planned_step.evolution_plan
     workspace = request.workspace_state
     workspace_workunit_ids = {workunit.workunit_id for workunit in workspace.active_work_units}
-    plan_workunit_ids = {mutation.workunit_id for mutation in plan.workunit_mutations}
-    valid_workunit_ids = workspace_workunit_ids | plan_workunit_ids
+    created_workunit_ids = {
+        mutation.workunit_id for mutation in plan.workunit_mutations if mutation.action == "create"
+    }
+    valid_workunit_ids = workspace_workunit_ids | created_workunit_ids
 
     if plan.source_event_id != event.event_id:
         errors.append(
@@ -61,7 +63,7 @@ def validate_planned_step(
 
     for mutation in plan.workunit_mutations:
         if mutation.action != "create" and mutation.workunit_id not in workspace_workunit_ids:
-            warnings.append(
+            errors.append(
                 f"workunit mutation '{mutation.workunit_id}' uses action '{mutation.action}' "
                 "for a workunit not currently present in workspace state"
             )

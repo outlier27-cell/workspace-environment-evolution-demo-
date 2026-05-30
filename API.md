@@ -23,6 +23,7 @@ Current generation status:
 - A production non-rule generator should implement `PlanningBackend` and report `generation_mode` as `llm` or `external_provider`.
 - Every backend output passes a validation gate before mock state application. Invalid references return HTTP `422` with a structured validation report.
 - Unknown mock-store `user_id`, `environment_id`, or `workspace_id` values return HTTP `404` with a structured resource-not-found error.
+- Store-backed endpoints support an optional `run_id` field or query parameter. Each non-default `run_id` gets isolated mock state, event history, generated tasks, and quality reports. Non-default runs are process-local demo state, capped at 32 active runs, and `run_id` must match `[A-Za-z0-9_.-]{1,48}`.
 
 The API models:
 
@@ -90,6 +91,7 @@ curl -X POST "https://<your-api-domain>/api/environment-agent/simulate" \
     "user_id": "user_logistics_001",
     "environment_id": "env_peak_logistics",
     "workspace_id": "workspace_logistics_demo",
+    "run_id": "demo_run",
     "seed": 7,
     "steps": 3,
     "reset_before_run": true
@@ -137,6 +139,7 @@ The API checks backend output before applying workspace evolution or forwarding 
 ```text
 event links
 WorkUnit references
+non-create WorkUnit mutations must reference existing WorkUnits
 artifact dependencies
 dependency graph endpoints
 task required artifacts
@@ -216,3 +219,5 @@ get_historical_tasks(workspace_id)
 ```
 
 Replace `MockRuleBasedPlanningBackend` with your real `PlanningBackend` implementation when you want non-rule generation. The Environment Agent remains the orchestration layer and validates the returned `PlannedEnvironmentStep` before downstream agents act. A real Workspace Agent should materialize files, a Task Agent should generate benchmark tasks/rubrics, and a Generation Manager should coordinate snapshots and termination.
+
+`POST /api/environment-agent/manager-payload/from-store` returns a Generation Manager handoff payload. If `apply_to_mock_state` is `true`, the generated step is also persisted to the selected mock run before the payload is returned, matching `step/from-store` state semantics.
